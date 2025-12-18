@@ -307,7 +307,7 @@ install_pnpm() {
     rm -rf "$USER_HOME/.npm-global/lib/node_modules/pnpm"
     
     # 使用 npm 安装 pnpm
-    npm install -g pnpm@9 || error "pnpm 安装失败"
+    npm install -g pnpm || error "pnpm 安装失败"
     
     # 配置 pnpm
     pnpm setup
@@ -338,6 +338,7 @@ start_n8n() {
         return 0
     else
         log "启动 n8n..."
+        NODE_OPTIONS="--max-old-space-size=320"
         nohup n8n start >> "${USER_HOME}/n8n-serv00/n8n/logs/n8n.log" 2>&1 &
         sleep 10
         if check_status; then
@@ -399,7 +400,7 @@ main() {
     export PNPM_HOME="$USER_HOME/.local/share/pnpm"
     export PATH="$PNPM_HOME:$PATH"
     
-    pnpm install -g n8n@1.77.1 || error "n8n 安装失败"
+    pnpm install -g n8n || error "n8n 安装失败"
     
     update_profile
     re_source
