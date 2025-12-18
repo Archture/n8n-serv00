@@ -266,7 +266,7 @@ export NODE_FUNCTION_ALLOW_BUILTIN=*
 export NODE_FUNCTION_ALLOW_EXTERNAL=*
 
 # 内存限制 (关键优化)
-export NODE_OPTIONS="--max-old-space-size=256 --gc-interval=100"
+export NODE_OPTIONS="--max-old-space-size=256"
 export UV_THREADPOOL_SIZE=2
 
 EOF
@@ -333,7 +333,7 @@ install_n8n_optimized() {
     export PNPM_HOME="$USER_HOME/.local/share/pnpm"
     export PATH="$PNPM_HOME:$PATH"
     
-    # 设置 Node.js 内存限制
+    # 设置 Node.js 内存限制（移除无效的 gc-interval 参数）
     export NODE_OPTIONS="--max-old-space-size=384"
     
     log "正在安装 N8N v${N8N_VERSION}..."
@@ -374,6 +374,10 @@ start_n8n() {
     
     log "启动 N8N..."
     
+    # 重新加载环境变量确保 PATH 正确
+    re_source
+    
+    # 查找 n8n 可执行文件
     local N8N_BIN=""
     if [[ -f "$USER_HOME/.local/share/pnpm/n8n" ]]; then
         N8N_BIN="$USER_HOME/.local/share/pnpm/n8n"
@@ -382,16 +386,18 @@ start_n8n() {
     elif command -v n8n >/dev/null 2>&1; then
         N8N_BIN=$(command -v n8n)
     else
-        error "无法找到 n8n 执行文件"
+        error "无法找到 n8n 执行文件，请检查安装"
     fi
     
     log "N8N 路径: $N8N_BIN"
     
-    # 应用内存限制
-    export NODE_OPTIONS="--max-old-space-size=256 --gc-interval=100"
+    # 应用内存限制（移除无效的 gc-interval 参数）
+    export NODE_OPTIONS="--max-old-space-size=256"
     export UV_THREADPOOL_SIZE=2
     
-    nohup n8n start >> "${USER_HOME}/n8n-serv00/n8n/logs/n8n.log" 2>&1 &
+    # 使用绝对路径启动 n8n
+    cd "$USER_HOME" || error "无法切换到用户目录"
+    nohup "$N8N_BIN" start >> "${USER_HOME}/n8n-serv00/n8n/logs/n8n.log" 2>&1 &
     
     log "等待 N8N 启动（60秒）..."
     sleep 60
@@ -400,7 +406,9 @@ start_n8n() {
         log "N8N 启动成功！"
         log "日志文件: ${USER_HOME}/n8n-serv00/n8n/logs/n8n.log"
     else
-        error "N8N 启动失败，请查看日志: ${USER_HOME}/n8n-serv00/n8n/logs/n8n.log"
+        warn "N8N 启动失败，显示最后 20 行日志："
+        tail -n 20 "${USER_HOME}/n8n-serv00/n8n/logs/n8n.log"
+        error "请检查上述日志信息"
     fi
 }
 
@@ -486,11 +494,14 @@ cronjob() {
         echo "n8n 状态检查..."
     } >> "${USER_HOME}/n8n-serv00/n8n/logs/cronjob.log"
     
+    # 重新加载环境变量
+    re_source
+    
     if check_status; then
-        log "N8N 运行正常"
+        echo "N8N 运行正常" >> "${USER_HOME}/n8n-serv00/n8n/logs/cronjob.log"
     else
-        log "N8N 未运行，尝试重启..."
-        start_n8n
+        echo "N8N 未运行，尝试重启..." >> "${USER_HOME}/n8n-serv00/n8n/logs/cronjob.log"
+        start_n8n >> "${USER_HOME}/n8n-serv00/n8n/logs/cronjob.log" 2>&1
     fi
     
     echo "============" >> "${USER_HOME}/n8n-serv00/n8n/logs/cronjob.log"
