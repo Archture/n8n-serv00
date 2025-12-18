@@ -232,6 +232,8 @@ export WEBHOOK_URL="https://${WEBHOOK_URL}"
 export N8N_HOST=0.0.0.0
 export N8N_PROTOCOL=https
 export GENERIC_TIMEZONE=Asia/Shanghai
+export N8N_SECURE_COOKIE=false
+export N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN=true
 
 # 性能优化配置
 export N8N_METRICS=false
