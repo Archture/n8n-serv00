@@ -399,7 +399,7 @@ main() {
     export PNPM_HOME="$USER_HOME/.local/share/pnpm"
     export PATH="$PNPM_HOME:$PATH"
     
-    pnpm install -g n8n@1.91.3 || error "n8n 安装失败"
+    pnpm install -g n8n@1.77.1 || error "n8n 安装失败"
     
     update_profile
     re_source
