@@ -216,7 +216,7 @@ export NODE_FUNCTION_ALLOW_BUILTIN=*
 export NODE_FUNCTION_ALLOW_EXTERNAL=*
 
 # 限制 Node.js 内存使用 (MB)，防止在 Serv00 上被杀
-export NODE_OPTIONS="--max-old-space-size=448"
+export NODE_OPTIONS="--max-old-space-size=320"
 
 EOF
     log "环境变量配置已更新"
