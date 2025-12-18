@@ -214,6 +214,10 @@ export N8N_ENCRYPTION_KEY="n8n8n8n"
 export NODE_FUNCTION_ALLOW_BUILTIN=*
 # 允许使用外部 npm 模块
 export NODE_FUNCTION_ALLOW_EXTERNAL=*
+
+# 限制 Node.js 内存使用 (MB)，防止在 Serv00 上被杀
+export NODE_OPTIONS="--max-old-space-size=448"
+
 EOF
     log "环境变量配置已更新"
 }
@@ -303,7 +307,7 @@ install_pnpm() {
     rm -rf "$USER_HOME/.npm-global/lib/node_modules/pnpm"
     
     # 使用 npm 安装 pnpm
-    npm install -g pnpm || error "pnpm 安装失败"
+    npm install -g pnpm@9 || error "pnpm 安装失败"
     
     # 配置 pnpm
     pnpm setup
@@ -395,7 +399,7 @@ main() {
     export PNPM_HOME="$USER_HOME/.local/share/pnpm"
     export PATH="$PNPM_HOME:$PATH"
     
-    pnpm install -g n8n || error "n8n 安装失败"
+    pnpm install -g n8n@1.91.3 || error "n8n 安装失败"
     
     update_profile
     re_source
