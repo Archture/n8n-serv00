@@ -29,7 +29,7 @@ ssh 用户名@s13.serv00.com
 
 2. 一键命令：克隆仓库并运行安装脚本：
 ```bash
-git clone https://github.com/aigem/n8n-serv00.git && cd n8n-serv00 && bash i.sh
+git clone https://github.com/Archture/n8n-serv00.git && cd n8n-serv00 && bash i.sh
 ```
 
 
