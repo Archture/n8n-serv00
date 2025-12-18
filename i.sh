@@ -338,9 +338,26 @@ start_n8n() {
         return 0
     else
         log "启动 n8n..."
-        NODE_OPTIONS="--max-old-space-size=320"
+
+        # --- 修复 1: 绝对路径查找 (解决 nohup 找不到文件的问题) ---
+        # 新版 pnpm 路径结构可能变化，这里进行多重探测
+        local N8N_BIN=""
+        if [[ -f "$USER_HOME/.local/share/pnpm/n8n" ]]; then
+            N8N_BIN="$USER_HOME/.local/share/pnpm/n8n"
+        elif [[ -f "$USER_HOME/.npm-global/bin/n8n" ]]; then
+            N8N_BIN="$USER_HOME/.npm-global/bin/n8n"
+        elif command -v n8n >/dev/null 2>&1; then
+            N8N_BIN=$(command -v n8n)
+        else
+            error "无法找到 n8n 执行文件，请检查安装步骤是否成功！"
+        fi
+        
+        log "找到 n8n 路径: $N8N_BIN"
+        
+        export NODE_OPTIONS="--max-old-space-size=320"
+        export UV_THREADPOOL_SIZE = 1
         nohup n8n start >> "${USER_HOME}/n8n-serv00/n8n/logs/n8n.log" 2>&1 &
-        sleep 10
+        sleep 60
         if check_status; then
             log "日志文件位置: ${USER_HOME}/n8n-serv00/n8n/logs/n8n.log"
         else
