@@ -355,7 +355,7 @@ start_n8n() {
         log "找到 n8n 路径: $N8N_BIN"
         
         export NODE_OPTIONS="--max-old-space-size=320"
-        export UV_THREADPOOL_SIZE = 1
+        export UV_THREADPOOL_SIZE=1
         nohup n8n start >> "${USER_HOME}/n8n-serv00/n8n/logs/n8n.log" 2>&1 &
         sleep 60
         if check_status; then
